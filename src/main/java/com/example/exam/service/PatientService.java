@@ -43,18 +43,20 @@ public class PatientService {
     public boolean update(Integer id, PatientDto patientDto) {
         Patient update = getEntity(id);
         convertDtoToEntity(patientDto, update);
+        update.setUpdatedAt(LocalDateTime.now());
         patientRepository.save(update);
         return true;
     }
 
     public boolean delete(Integer id) {
         Patient patient = getEntity(id);
-        patientRepository.delete(patient);
+        patient.setDeletedAt(LocalDateTime.now());
+        patientRepository.save(patient);
         return true;
     }
 
     public Patient getEntity(Integer id) {
-        Optional<Patient> optional = patientRepository.findById(id);
+        Optional<Patient> optional = patientRepository.findByIdAndDeletedAtIsNull(id);
         if (optional.isEmpty()) {
             throw new BadRequest("Patient not found");
         }
@@ -83,9 +85,11 @@ public class PatientService {
         Page<Patient> resultPage = patientRepository.findAll(pageable);
         List<PatientDto> response = new LinkedList<>();
         for (Patient patient : resultPage) {
-            PatientDto dto = new PatientDto();
-            convertEntityToDto(patient, dto);
-            response.add(dto);
+            if (patient.getDeletedAt() == null) {
+                PatientDto dto = new PatientDto();
+                convertEntityToDto(patient, dto);
+                response.add(dto);
+            }
         }
         return response;
     }
