@@ -50,18 +50,18 @@ public class VisitService {
         return dto;
     }
 
-    public Visit update(Integer id, Visit visit) {
-        Visit update = getEntity(id);
+    public boolean update(Integer id, VisitDto dto) {
+        Visit visit = getEntity(id);
         //TODO: check doctor
-        doctorService.getEntity(visit.getDoctorId());
-        update.setDoctorId(visit.getDoctorId());
+        doctorService.getEntity(dto.getDoctorId());
+        visit.setDoctorId(dto.getDoctorId());
         //TODO: check patient
-        patientService.getEntity(visit.getPatientId());
-        update.setPatientId(visit.getPatientId());
+        patientService.getEntity(dto.getPatientId());
+        visit.setPatientId(dto.getPatientId());
 
-        update.setDiagnosis(visit.getDiagnosis());
-        visitRepository.save(update);
-        return update;
+        visit.setDiagnosis(dto.getDiagnosis());
+        visitRepository.save(visit);
+        return true;
     }
 
 

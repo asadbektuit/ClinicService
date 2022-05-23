@@ -29,4 +29,6 @@ public class PatientDto {
     private Integer age;
     private Boolean status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

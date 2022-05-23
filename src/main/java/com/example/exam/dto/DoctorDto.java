@@ -26,4 +26,6 @@ public class DoctorDto {
     private Integer experience;
     private Boolean status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

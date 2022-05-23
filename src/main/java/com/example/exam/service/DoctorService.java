@@ -47,18 +47,20 @@ public class DoctorService {
         update.setContact(doctor.getContact());
         update.setDirection(doctor.getDirection());
         update.setExperience(doctor.getExperience());
+        update.setUpdatedAt(LocalDateTime.now());
         doctorRepository.save(update);
         return true;
     }
 
     public boolean delete(Integer id) {
         Doctor doctor = getEntity(id);
-        doctorRepository.delete(doctor);
+        doctor.setDeletedAt(LocalDateTime.now());
+        doctorRepository.save(doctor);
         return true;
     }
 
     public Doctor getEntity(Integer id){
-        Optional<Doctor> optional = doctorRepository.findById(id);
+        Optional<Doctor> optional = doctorRepository.findByIdAndDeletedAtIsNull(id);
         if (optional.isEmpty()){
             throw new BadRequest("Doctor not found");
         }

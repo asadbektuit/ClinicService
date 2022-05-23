@@ -5,11 +5,15 @@ import com.example.exam.model.Patient;
 import com.example.exam.repository.PatientRepository;
 import com.example.exam.exception.BadRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +32,7 @@ public class PatientService {
 
     public PatientDto create(PatientDto patientDto) {
         Patient patient = new Patient();
-        convertDtoToEntity(patientDto,patient);
+        convertDtoToEntity(patientDto, patient);
         patient.setStatus(true);
         patient.setCreatedAt(LocalDateTime.now());
         patientRepository.save(patient);
@@ -43,13 +47,13 @@ public class PatientService {
         return true;
     }
 
-    public boolean delete(Integer id){
+    public boolean delete(Integer id) {
         Patient patient = getEntity(id);
         patientRepository.delete(patient);
         return true;
     }
 
-    public Patient getEntity(Integer id){
+    public Patient getEntity(Integer id) {
         Optional<Patient> optional = patientRepository.findById(id);
         if (optional.isEmpty()) {
             throw new BadRequest("Patient not found");
@@ -57,7 +61,7 @@ public class PatientService {
         return optional.get();
     }
 
-    public void convertDtoToEntity(PatientDto dto, Patient entity){
+    public void convertDtoToEntity(PatientDto dto, Patient entity) {
         entity.setName(dto.getName());
         entity.setSurname(dto.getSurname());
         entity.setBirthday(dto.getBirthday());
@@ -65,7 +69,7 @@ public class PatientService {
         entity.setContact(dto.getContact());
     }
 
-    public void convertEntityToDto(Patient entity, PatientDto dto){
+    public void convertEntityToDto(Patient entity, PatientDto dto) {
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setSurname(entity.getSurname());
@@ -75,6 +79,14 @@ public class PatientService {
     }
 
     public List<PatientDto> findAllByPage(Integer page, Integer size) {
-        return null;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Patient> resultPage = patientRepository.findAll(pageable);
+        List<PatientDto> response = new LinkedList<>();
+        for (Patient patient : resultPage) {
+            PatientDto dto = new PatientDto();
+            convertEntityToDto(patient, dto);
+            response.add(dto);
+        }
+        return response;
     }
 }
